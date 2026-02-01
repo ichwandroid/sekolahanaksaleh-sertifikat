@@ -1,0 +1,21 @@
+# robots.txt untuk Sekolah Anak Saleh - Portal Sertifikat
+
+# Blokir semua search engine dari mengindeks halaman sertifikat
+User-agent: *
+Disallow: /certificate.html
+Disallow: /data.js
+Disallow: /certificate.js
+
+# Izinkan hanya halaman utama (index.html)
+Allow: /index.html
+Allow: /$
+
+# Blokir bot tertentu
+User-agent: Googlebot
+Disallow: /certificate.html
+
+User-agent: Bingbot
+Disallow: /certificate.html
+
+User-agent: Slurp
+Disallow: /certificate.html
