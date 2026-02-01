@@ -1,345 +1,159 @@
-
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description"
-    content="Sistem Pembuatan Sertifikat Assembly SD Anak Saleh - Download sertifikat siswa dengan mudah">
-  <meta name="author" content="SD Anak Saleh">
-  <title>Sertifikat Assembly SD Anak Saleh</title>
-  <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
-
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- GSAP -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-  <!-- Tailwind Config -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            'sans': ['Outfit', 'sans-serif'],
-          },
-          colors: {
-            primary: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#0ea5e9',
-              600: '#0284c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-            },
-          }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portal Sertifikat SD Anak Saleh">
+    <title>Portal Sertifikat SD Anak Saleh</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Outfit', 'sans-serif'],
+                    },
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-  <style>
-    body {
-      font-family: 'Outfit', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    /* Glassmorphism Card */
-    .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    }
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.2);
+        }
 
-    /* Custom Select Styling */
-    .custom-select-wrapper {
-      position: relative;
-    }
+        .shape {
+            position: absolute;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite ease-in-out;
+        }
 
-    .custom-select {
-      appearance: none;
-      -webkit-appearance: none;
-      width: 100%;
-      padding: 1rem 1.25rem;
-      padding-right: 3rem;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #1f2937;
-      background-color: #f9fafb;
-      border: 2px solid #e5e7eb;
-      border-radius: 1rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
+        .shape-1 {
+            top: -10%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: #a78bfa;
+            animation-delay: 0s;
+        }
 
-    .custom-select:hover:not(:disabled) {
-      border-color: #a5b4fc;
-      background-color: #fff;
-    }
+        .shape-2 {
+            bottom: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: #f472b6;
+            animation-delay: -5s;
+        }
 
-    .custom-select:focus {
-      outline: none;
-      border-color: #6366f1;
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-      background-color: #fff;
-    }
+        @keyframes float {
 
-    .custom-select:disabled {
-      background-color: #f3f4f6;
-      border-color: #e5e7eb;
-      color: #9ca3af;
-      cursor: not-allowed;
-    }
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
 
-    /* Custom Arrow */
-    .select-arrow {
-      position: absolute;
-      right: 1.25rem;
-      top: 50%;
-      transform: translateY(-50%);
-      pointer-events: none;
-      transition: transform 0.3s ease;
-    }
-
-    .custom-select:focus+.select-arrow {
-      transform: translateY(-50%) rotate(180deg);
-      color: #6366f1;
-    }
-
-    /* Button Gradient */
-    .btn-primary {
-      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
-      filter: brightness(1.1);
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: translateY(0);
-    }
-
-    .btn-primary:disabled {
-      background: #d1d5db;
-      /* Gray-300 */
-      color: #9ca3af;
-      /* Gray-400 */
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    /* Floating Shapes */
-    .shape {
-      position: absolute;
-      filter: blur(80px);
-      z-index: -1;
-      opacity: 0.6;
-      animation: float 10s infinite ease-in-out;
-    }
-
-    .shape-1 {
-      top: -10%;
-      right: -10%;
-      width: 400px;
-      height: 400px;
-      background: #a78bfa;
-      animation-delay: 0s;
-    }
-
-    .shape-2 {
-      bottom: -10%;
-      left: -10%;
-      width: 500px;
-      height: 500px;
-      background: #f472b6;
-      animation-delay: -5s;
-    }
-
-    @keyframes float {
-
-      0%,
-      100% {
-        transform: translate(0, 0);
-      }
-
-      50% {
-        transform: translate(30px, -30px);
-      }
-    }
-
-    /* Loading Spinner */
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-  </style>
+            50% {
+                transform: translate(30px, -30px);
+            }
+        }
+    </style>
 </head>
 
 <body class="flex items-center justify-center p-4">
-
-  <!-- Background Shapes -->
-  <div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-  </div>
-
-  <!-- Main Card -->
-  <main id="mainCard"
-    class="relative w-full max-w-md glass-card rounded-3xl p-8 sm:p-10 opacity-0 transform translate-y-4">
-
-    <!-- Header -->
-    <div class="text-center mb-10">
-      <div
-        class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl mb-6 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z">
-          </path>
-        </svg>
-      </div>
-      <h1 class="text-3xl font-bold text-gray-800 mb-2 tracking-tight">Sertifikat Assembly</h1>
-      <p class="text-gray-500 font-medium">SD Anak Saleh Malang</p>
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
     </div>
 
-    <!-- Form -->
-    <form id="certificateForm" class="space-y-6">
-
-      <!-- Kelas Input -->
-      <div class="space-y-2">
-        <label for="kelas" class="block text-sm font-semibold text-gray-700 ml-1">
-          Pilih Kelas
-        </label>
-        <div class="custom-select-wrapper">
-          <select id="kelas" class="custom-select">
-            <option value="">-- Pilih Kelas --</option>
-            <option value="1A - TREMBESI">1A - TREMBESI</option>
-            <option value="1B - KULIM">1B - KULIM</option>
-            <option value="1C - KENANGA">1C - KENANGA</option>
-            <option value="1D - PINGKU">1D - PINGKU</option>
-            <option value="2A - SUNGKAI">2A - SUNGKAI</option>
-            <option value="2B - RANDU">2B - RANDU</option>
-            <option value="2C - SENGON">2C - SENGON</option>
-            <option value="2D - MAHONI">2D - MAHONI</option>
-            <option value="3A - SAGA">3A - SAGA</option>
-            <option value="3B - BUNGUR">3B - BUNGUR</option>
-            <option value="3C - EBONI">3C - EBONI</option>
-            <option value="3D - CANTIGI">3D - CANTIGI</option>
-            <option value="4A - MERANTI">4A - MERANTI</option>
-            <option value="4B - DAMAR">4B - DAMAR</option>
-            <option value="4C - CENDANA">4C - CENDANA</option>
-            <option value="4D - ULIN">4D - ULIN</option>
-            <option value="5A - MERSAWA">5A - MERSAWA</option>
-            <option value="5B - PINUS">5B - PINUS</option>
-            <option value="5C - BERINGIN">5C - BERINGIN</option>
-            <option value="5D - CEMARA">5D - CEMARA</option>
-            <option value="6A - JATI">6A - JATI</option>
-            <option value="6B - PALAPI">6B - PALAPI</option>
-            <option value="6C - BINTANGUR">6C - BINTANGUR</option>
-            <option value="6D - MINDI">6D - MINDI</option>
-          </select>
-          <div class="select-arrow text-gray-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+    <main class="w-full max-w-4xl relative z-10">
+        <div class="text-center mb-12 opacity-0 -translate-y-4 header-anim">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-md">Portal Sertifikat</h1>
+            <p class="text-white/80 text-lg font-medium">SD Anak Saleh Malang</p>
         </div>
-      </div>
 
-      <!-- Nama Input -->
-      <div class="space-y-2">
-        <label for="nama" class="block text-sm font-semibold text-gray-700 ml-1">
-          Nama Siswa
-        </label>
-        <div class="custom-select-wrapper">
-          <select id="nama" disabled class="custom-select">
-            <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
-          </select>
-          <div class="select-arrow text-gray-400">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <!-- Assembly Card -->
+            <a href="sertifikat-assembly.html"
+                class="glass-card rounded-3xl p-8 group block text-center cursor-pointer opacity-0 translate-y-4 card-anim">
+                <div
+                    class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z">
+                        </path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors">
+                    Sertifikat Assembly</h2>
+                <p class="text-gray-500 mb-6">Buat sertifikat untuk kegiatan assembly siswa</p>
+                <div
+                    class="inline-block px-6 py-2 rounded-full bg-indigo-50 text-indigo-600 font-semibold text-sm group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                    Buat Sekarang &rarr;
+                </div>
+            </a>
+
+            <!-- Pramuka Card -->
+            <a href="sertifikat-pramuka.html"
+                class="glass-card rounded-3xl p-8 group block text-center cursor-pointer opacity-0 translate-y-4 card-anim">
+                <div
+                    class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-orange-600 transition-colors">
+                    Sertifikat Pramuka</h2>
+                <p class="text-gray-500 mb-6">Buat sertifikat untuk kegiatan kepramukaan siswa</p>
+                <div
+                    class="inline-block px-6 py-2 rounded-full bg-orange-50 text-orange-600 font-semibold text-sm group-hover:bg-orange-600 group-hover:text-white transition-all">
+                    Buat Sekarang &rarr;
+                </div>
+            </a>
         </div>
-      </div>
 
-      <!-- Action Button -->
-      <div class="pt-4">
-        <button type="submit" id="downloadBtn" disabled
-          class="btn-primary w-full py-4 px-6 rounded-2xl text-white font-bold text-lg shadow-lg flex items-center justify-center gap-3">
-          <span id="btnText">Preview Sertifikat</span>
-          <svg id="downloadIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
-            </path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-            </path>
-          </svg>
-          <div id="loadingSpinner" class="spinner hidden"></div>
-        </button>
-      </div>
+        <div class="mt-12 text-center opacity-0 footer-anim">
+            <p class="text-white/60 text-sm font-medium tracking-wide">© 2025 SD ANAK SALEH MALANG</p>
+        </div>
+    </main>
 
-    </form>
-
-    <!-- Footer -->
-    <div class="mt-10 pt-6 border-t border-gray-100 text-center">
-      <p class="text-xs text-gray-400 font-medium tracking-wide">
-        © 2025 SD ANAK SALEH MALANG
-      </p>
-    </div>
-
-  </main>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed top-6 right-6 transform translate-x-full opacity-0 transition-all duration-500 z-50">
-    <div
-      class="bg-white border-l-4 border-green-500 text-gray-800 px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 max-w-sm">
-      <div class="bg-green-100 p-2 rounded-full">
-        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-        </svg>
-      </div>
-      <div>
-        <h4 class="font-bold text-sm">Berhasil!</h4>
-        <p id="toastMessage" class="text-sm text-gray-600">Sertifikat berhasil didownload.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script src="js/data-siswa.js"></script>
-  <script src="js/index.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tl = gsap.timeline();
+            tl.to('.header-anim', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
+                .to('.card-anim', { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: 'power3.out' }, '-=0.4')
+                .to('.footer-anim', { opacity: 1, duration: 0.8, ease: 'power3.out' }, '-=0.4');
+        });
+    </script>
 </body>
 
 </html>
