@@ -38,7 +38,63 @@ document.addEventListener('DOMContentLoaded', () => {
         ease: 'power2.out',
         delay: 0.2
     });
+    // Initialize dynamic dropdown
+    initializeKelasDropdown();
 });
+
+// ============================================
+// Dynamic Dropdown Logic
+// ============================================
+
+// Release Dates Mapping
+const releaseDates = {
+    '1': new Date('2026-02-02'),
+    '2': new Date('2026-02-04'),
+    '3': new Date('2026-02-05'),
+    '4': new Date('2026-02-11'),
+    '5': new Date('2026-02-09'),
+    '6': new Date('2026-02-09')
+};
+
+function initializeKelasDropdown() {
+    const now = new Date();
+    // For testing/development, you can uncomment the line below to simulate a specific date
+    // const now = new Date('2026-02-12'); 
+
+    // Get unique classes from dataSiswa
+    const allClassNames = [...new Set(dataSiswa.map(s => s.kelas))].sort();
+
+    // Clear current options (except the first one)
+    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+
+    let availableClassesCount = 0;
+
+    allClassNames.forEach(className => {
+        // Find the first student in this class to get their level
+        const sampleStudent = dataSiswa.find(s => s.kelas === className);
+        if (sampleStudent) {
+            const level = sampleStudent.level;
+            const releaseDate = releaseDates[level];
+
+            // Only add to dropdown if it's already the release date
+            if (now >= releaseDate) {
+                const option = document.createElement('option');
+                option.value = className;
+                option.textContent = className;
+                kelasSelect.appendChild(option);
+                availableClassesCount++;
+            }
+        }
+    });
+
+    if (availableClassesCount === 0) {
+        const noClassOption = document.createElement('option');
+        noClassOption.value = "";
+        noClassOption.textContent = "-- Belum ada sertifikat yang tersedia --";
+        noClassOption.disabled = true;
+        kelasSelect.appendChild(noClassOption);
+    }
+}
 
 // ============================================
 // Event Listeners
