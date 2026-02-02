@@ -4,36 +4,451 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sertifikat Pramuka - SD Anak Saleh</title>
+    <meta name="description"
+        content="Sistem Pembuatan Sertifikat Pramuka SD Anak Saleh - Download sertifikat siswa dengan mudah">
+    <meta name="author" content="SD Anak Saleh">
+    <title>Sertifikat Pramuka SD Anak Saleh</title>
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚜️</text></svg>">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Balsamiq+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Outfit', 'sans-serif'],
+                        'heading': ['Balsamiq Sans', 'cursive'],
+                    },
+                    colors: {
+                        pramuka: {
+                            50: '#fef7ed',
+                            100: '#fdedd6',
+                            200: '#fbd8ab',
+                            300: '#f7bb75',
+                            400: '#f2963f',
+                            500: '#ee7b1b',
+                            600: '#df6111',
+                            700: '#b94910',
+                            800: '#933b13',
+                            900: '#763212',
+                        },
+                        rimba: {
+                            50: '#f2f9f1',
+                            100: '#e1f1df',
+                            200: '#c5e3c1',
+                            300: '#99cc92',
+                            400: '#67ad5e',
+                            500: '#46913e',
+                            600: '#35752e',
+                            700: '#2c5d26',
+                            800: '#254a22',
+                            900: '#213f1f',
+                        },
+                        tanah: {
+                            50: '#f7f6f5',
+                            100: '#eceae6',
+                            200: '#d9d4cd',
+                            300: '#bcb3a5',
+                            400: '#9e8f7a',
+                            500: '#84735f',
+                            600: '#6b5c4d',
+                            700: '#594d41',
+                            800: '#4b4138',
+                            900: '#423a33',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         body {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            font-family: 'Outfit', sans-serif;
+            background-color: #3e2723;
             min-height: 100vh;
-            font-family: system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Custom Select Styling */
+        .custom-select-wrapper {
+            position: relative;
+        }
+
+        .custom-select {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 100%;
+            padding: 1rem 1.25rem;
+            padding-right: 3rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #3e2723;
+            background-color: #fff;
+            border: 2px solid #d7ccc8;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .custom-select:hover:not(:disabled) {
+            border-color: #f2963f;
+            background-color: #fff;
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: #ee7b1b;
+            box-shadow: 0 0 0 4px rgba(238, 123, 27, 0.1);
+            background-color: #fff;
+        }
+
+        .custom-select:disabled {
+            background-color: #efebe9;
+            border-color: #d7ccc8;
+            color: #a1887f;
+            cursor: not-allowed;
+        }
+
+        /* Custom Arrow */
+        .select-arrow {
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            transition: transform 0.3s ease;
+        }
+
+        .custom-select:focus+.select-arrow {
+            transform: translateY(-50%) rotate(180deg);
+            color: #ee7b1b;
+        }
+
+        /* Button Gradient */
+        .btn-pramuka {
+            background: linear-gradient(135deg, #ee7b1b 0%, #763212 100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-pramuka:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(238, 123, 27, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-pramuka:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-pramuka:disabled {
+            background: #d7ccc8;
+            color: #a1887f;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .scout-texture {
+            background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
+            opacity: 0.05;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
         }
     </style>
 </head>
 
 <body class="flex items-center justify-center p-4">
-    <div class="bg-white/90 backdrop-blur-md p-10 rounded-3xl shadow-2xl text-center max-w-md w-full">
-        <div class="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
-                </path>
-            </svg>
-        </div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Sertifikat Pramuka</h1>
-        <p class="text-gray-500 mb-8">Halaman ini sedang dalam tahap pengembangan.</p>
 
-        <a href="index.html"
-            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors">
-            Kembali ke Menu Utama
-        </a>
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Main Card -->
+    <main id="mainCard"
+        class="relative w-full max-w-md glass-card rounded-3xl p-8 sm:p-10 opacity-0 transform translate-y-4 overflow-hidden">
+        <div class="scout-texture"></div>
+
+        <!-- Header -->
+        <div class="text-center mb-10 relative z-10">
+            <div
+                class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-pramuka-500 to-tanah-800 rounded-2xl shadow-xl mb-6 transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <!-- Scout Icon (Fleur-de-lis inspired) -->
+                <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L10 7H2L7 11L5 19L12 15L19 19L17 11L22 7H14L12 2Z" />
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-tanah-900 mb-2 tracking-tight font-heading">Sertifikat Pramuka</h1>
+            <p class="text-tanah-600 font-medium">SD Anak Saleh Malang</p>
+        </div>
+
+        <!-- Form -->
+        <form id="certificateForm" class="space-y-6 relative z-10">
+
+            <!-- Kelas Input -->
+            <div class="space-y-2">
+                <label for="kelas" class="block text-sm font-bold text-tanah-800 ml-1">
+                    Pilih Kelas
+                </label>
+                <div class="custom-select-wrapper">
+                    <select id="kelas" class="custom-select">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="1A - TREMBESI">1A - TREMBESI</option>
+                        <option value="1B - KULIM">1B - KULIM</option>
+                        <option value="1C - KENANGA">1C - KENANGA</option>
+                        <option value="1D - PINGKU">1D - PINGKU</option>
+                        <option value="2A - SUNGKAI">2A - SUNGKAI</option>
+                        <option value="2B - RANDU">2B - RANDU</option>
+                        <option value="2C - SENGON">2C - SENGON</option>
+                        <option value="2D - MAHONI">2D - MAHONI</option>
+                        <option value="3A - SAGA">3A - SAGA</option>
+                        <option value="3B - BUNGUR">3B - BUNGUR</option>
+                        <option value="3C - EBONI">3C - EBONI</option>
+                        <option value="3D - CANTIGI">3D - CANTIGI</option>
+                        <option value="4A - MERANTI">4A - MERANTI</option>
+                        <option value="4B - DAMAR">4B - DAMAR</option>
+                        <option value="4C - CENDANA">4C - CENDANA</option>
+                        <option value="4D - ULIN">4D - ULIN</option>
+                        <option value="5A - MERSAWA">5A - MERSAWA</option>
+                        <option value="5B - PINUS">5B - PINUS</option>
+                        <option value="5C - BERINGIN">5C - BERINGIN</option>
+                        <option value="5D - CEMARA">5D - CEMARA</option>
+                        <option value="6A - JATI">6A - JATI</option>
+                        <option value="6B - PALAPI">6B - PALAPI</option>
+                        <option value="6C - BINTANGUR">6C - BINTANGUR</option>
+                        <option value="6D - MINDI">6D - MINDI</option>
+                    </select>
+                    <div class="select-arrow text-tanah-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nama Input -->
+            <div class="space-y-2">
+                <label for="nama" class="block text-sm font-bold text-tanah-800 ml-1">
+                    Nama Siswa
+                </label>
+                <div class="custom-select-wrapper">
+                    <select id="nama" disabled class="custom-select">
+                        <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+                    </select>
+                    <div class="select-arrow text-tanah-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-4">
+                <button type="submit" id="downloadBtn" disabled
+                    class="btn-pramuka w-full py-4 px-6 rounded-2xl text-white font-bold text-lg shadow-lg flex items-center justify-center gap-3">
+                    <span id="btnText">Preview Sertifikat</span>
+                    <svg id="downloadIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                        </path>
+                    </svg>
+                    <div id="loadingSpinner" class="spinner hidden"></div>
+                </button>
+            </div>
+
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-10 pt-6 border-t border-tanah-100 text-center relative z-10">
+            <p class="text-xs text-tanah-400 font-bold tracking-widest uppercase">
+                © 2025 SD ANAK SALEH MALANG
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-6 right-6 transform translate-x-full opacity-0 transition-all duration-500 z-50">
+        <div
+            class="bg-white border-l-4 border-pramuka-500 text-tanah-900 px-6 py-4 rounded-lg shadow-2xl flex items-center gap-4 max-w-sm">
+            <div class="bg-pramuka-100 p-2 rounded-full">
+                <svg class="w-6 h-6 text-pramuka-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm">Berhasil!</h4>
+                <p id="toastMessage" class="text-sm text-tanah-600">Sertifikat berhasil didownload.</p>
+            </div>
+        </div>
     </div>
+
+    <!-- Scripts -->
+    <script src="js/data-siswa.js"></script>
+    <script src="js/pramuka.js"></script>
+    <script>
+        // Three.js Background Logic
+        const initThree = () => {
+            const canvas = document.querySelector('#three-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setClearColor(0x3e2723, 1);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+
+            // Particles
+            const particlesCount = 200;
+            const positions = new Float32Array(particlesCount * 3);
+            const colors = new Float32Array(particlesCount * 3);
+
+            const colorPalette = [
+                new THREE.Color(0xee7b1b), // Orange
+                new THREE.Color(0x46913e), // Green
+                new THREE.Color(0x84735f)  // Brown
+            ];
+
+            for (let i = 0; i < particlesCount; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 10;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+
+                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
+
+            // Abstract Floating Shapes (Trees/Mountains feel)
+            const shapesCount = 10;
+            const shapes = [];
+            for (let i = 0; i < shapesCount; i++) {
+                const geo = new THREE.ConeGeometry(0.5, 1, 4);
+                const mat = new THREE.MeshPhongMaterial({
+                    color: colorPalette[Math.floor(Math.random() * colorPalette.length)],
+                    transparent: true,
+                    opacity: 0.4,
+                    flatShading: true
+                });
+                const shape = new THREE.Mesh(geo, mat);
+                shape.position.set(
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 12,
+                    (Math.random() - 0.5) * 5 - 5
+                );
+                shape.rotation.x = Math.random() * Math.PI;
+                shape.rotation.y = Math.random() * Math.PI;
+                scene.add(shape);
+                shapes.push(shape);
+            }
+
+            // Lighting
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(1, 1, 2);
+            scene.add(light);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+            const animate = () => {
+                requestAnimationFrame(animate);
+
+                points.rotation.y += 0.001;
+                points.rotation.x += 0.0005;
+
+                shapes.forEach(s => {
+                    s.rotation.y += 0.005;
+                    s.position.y += Math.sin(Date.now() * 0.001 + s.position.x) * 0.002;
+                });
+
+                renderer.render(scene, camera);
+            };
+
+            const handleResize = () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            };
+
+            window.addEventListener('resize', handleResize);
+            handleResize();
+            animate();
+        };
+
+        window.onload = initThree;
+    </script>
 </body>
 
 </html>
