@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Release Dates Mapping
 const releaseDates = {
-    '1': new Date('2026-02-02'),
+    '1': new Date('2026-02-03'),
     '2': new Date('2026-02-04'),
     '3': new Date('2026-02-05'),
     '4': new Date('2026-02-11'),
